@@ -1,0 +1,552 @@
+swagger: "2.0"
+info:
+  description: "All times are in UTC format"
+  version: "1.0.0"
+  title: "Calendar API"
+# host: "petstore.swagger.io"
+# basePath: "/v2"
+tags:
+  - name: "user"
+    description: "Operations about user"
+  - name: "free times"
+    description: "Operations about free times"
+  - name: "appointments"
+    description: "Operations about appointments"
+# schemes:
+# - "http"
+paths:
+  /updateUserPosition:
+    post:
+      tags:
+        - "user"
+      summary: "Update user position"
+      operationId: "updateUserPosition"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: object
+            properties:
+              lat:
+                type: number
+                format: "float"
+                example: 48.85
+              long:
+                type: number
+                format: "float"
+                example: 2.3477
+      responses:
+        200:
+          description: "successful operation"
+        500:
+          description: "Request had invalid or missing arguments."
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                $ref: "#/definitions/InvalidOrMissingArgument"
+
+  /createFreeTimes:
+    post:
+      tags:
+        - "free times"
+      summary: "Create free times"
+      operationId: "createFreeTimes"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  periods:
+                    type: array
+                    items:
+                      $ref: "#/definitions/BasePeriod"
+      responses:
+        200:
+          description: "successful operation"
+        500:
+          description: "Request had invalid or missing arguments."
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                $ref: "#/definitions/InvalidOrMissingArgument"
+
+  /deleteFreeTimes:
+    post:
+      tags:
+        - "free times"
+      summary: "Delete free times"
+      operationId: "deleteFreeTimes"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  periods:
+                    type: array
+                    items:
+                      $ref: "#/definitions/BasePeriod"
+      responses:
+        200:
+          description: "successful operation"
+        500:
+          description: "Request had invalid or missing arguments."
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                $ref: "#/definitions/InvalidOrMissingArgument"
+
+
+  /getFreeTimes:
+    post:
+      tags:
+        - "free times"
+      summary: "Get free times"
+      operationId: "getFreeTimes"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/FreeTimesQueryParameters"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/FreeTimeResponse"
+        500:
+          description: "Request had invalid or missing arguments."
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                $ref: "#/definitions/InvalidOrMissingArgument"
+
+  /askForAppointment:
+    post:
+      tags:
+        - "appointments"
+      summary: "Ask for an appointment"
+      operationId: "askForAppointment"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  to:
+                    type: string
+                    example: "userID001"
+                  startDate:
+                    description: "Start date of the period in timestamp"
+                    type: "string"
+                    format: "date-time"
+                    example: "2020-09-21T08:00:00Z"
+                  endDate:
+                    description: "End date of the period in timestamp"
+                    type: "string"
+                    format: "date-time"
+                    example: "2020-09-21T18:00:00Z"
+                  infos:
+                    $ref: "#/definitions/AppointmentInfos"
+      responses:
+        200:
+          description: "successful operation"
+        409:
+          description: "Period is not free or can't validate period (eg: Start date after end date)"
+        500:
+          description: "Request had invalid or missing arguments."
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                $ref: "#/definitions/InvalidOrMissingArgument"
+
+  /getMyAppointmentDemandsReceived:
+    post:
+      tags:
+        - "appointments"
+      summary: "Get my appointments demands"
+      operationId: "getMyAppointmentDemandsReceived"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: object
+            properties:
+              result:
+                properties:
+                  aptID01:
+                    $ref: "#/definitions/AppointmentDemandModel"
+                  aptID02:
+                    $ref: "#/definitions/AppointmentDemandModel"
+
+  /getMyAppointmentDemandsSent:
+    post:
+      tags:
+        - "appointments"
+      summary: "Get my appointments demands sent"
+      operationId: "getMyAppointmentDemandsSent"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: object
+            properties:
+              result:
+                properties:
+                  aptID01:
+                    $ref: "#/definitions/AppointmentDemandModel"
+                  aptID02:
+                    $ref: "#/definitions/AppointmentDemandModel"
+
+  /acceptAppointment:
+    post:
+      tags:
+        - "appointments"
+      summary: "Accept an appointment demand"
+      operationId: "acceptAppointment"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  aptID:
+                    type: string
+                    example: "aptID0001"
+      responses:
+        200:
+          description: "successful operation"
+
+        500:
+          description: "error during operation"
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/definitions/ErrorsPeriodArray"
+
+  /refuseAppointment:
+    post:
+      tags:
+        - "appointments"
+      summary: "Refuse an appointment demand"
+      operationId: "refuseAppointment"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  aptID:
+                    type: string
+                    example: "aptID0001"
+      responses:
+        200:
+          description: "successful operation"
+        500:
+          description: "no rights or apt id doesn't exist"
+
+  /getAppointments:
+    post:
+      tags:
+        - "appointments"
+      summary: "Get the lists of appointments"
+      operationId: "getAppointments"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/definitions/BasePeriod"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: object
+            properties:
+              result:
+                properties:
+                  aptID01:
+                    $ref: "#/definitions/AppointmentModel"
+                  aptID02:
+                    $ref: "#/definitions/AppointmentModel"
+        500:
+          description: "Request had invalid or missing arguments."
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                $ref: "#/definitions/InvalidOrMissingArgument"
+
+  /cancelAppointmentDemand:
+    post:
+      tags:
+        - "appointments"
+      summary: "Cancel an appointment demand"
+      operationId: "cancelAppointmentDemand"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  aptID:
+                    type: string
+                    example: "aptID0001"
+      responses:
+        200:
+          description: "successful operation"
+        500:
+          description: "no rights or apt id doesn't exist"
+
+  /cancelAppointment:
+    post:
+      tags:
+        - "appointments"
+      summary: "Cancel an appointment"
+      operationId: "cancelAppointment"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  aptID:
+                    type: string
+                    example: "aptID0001"
+      responses:
+        200:
+          description: "successful operation"
+        500:
+          description: "no rights or apt id doesn't exist"
+
+
+definitions:
+  AppointmentInfos:
+    type: object
+    properties:
+      desc:
+        type: string
+        example: "Meeting about last semester results"
+      title:
+        type: string
+        example: "Result Meeting"
+
+  AppointmentModel:
+    type: object
+    properties:
+      from:
+        type: string
+        example: "UserID01"
+      to:
+        type: string
+        example: "UserID02"
+      startDate:
+        description: "Start date of the period in timestamp"
+        type: "string"
+        format: "date-time"
+        example: "2020-09-21T08:00:00Z"
+      endDate:
+        description: "End date of the period in timestamp"
+        type: "string"
+        format: "date-time"
+        example: "2020-09-21T18:00:00Z"
+      infos:
+        $ref: "#/definitions/AppointmentInfos"
+
+
+  AppointmentDemandModel:
+    type: object
+    $ref: "#/definitions/AppointmentModel"
+
+  FreeTimesQueryParameters:
+    type: "object"
+    properties:
+      startDate:
+        description: "Start date of the period in timestamp"
+        type: "string"
+        format: "date-time"
+        example: "2020-09-21T08:00:00Z"
+      endDate:
+        description: "End date of the period in timestamp"
+        type: "string"
+        format: "date-time"
+        example: "2020-09-21T18:00:00Z"
+      lat:
+        description: "Latitude"
+        type: "number"
+        format: "float"
+      long:
+        description: "Longitude"
+        type: "number"
+        format: "float"
+      radius:
+        description: "Radius"
+        type: "number"
+        format: "int64"
+
+  FreeTimeResponse:
+    description: a (key, BaseDate) map. `user1`is an example key (keyuser id)
+    properties:
+      userID01:
+        type: "array"
+        items:
+          $ref: "#/definitions/BasePeriod"
+      userID02:
+        type: "array"
+        items:
+          $ref: "#/definitions/BasePeriod"
+        example:
+          - startDate: "2020-09-21T08:00:00Z"
+            endDate: "2020-09-21T12:00:00Z"
+          - startDate: "2020-09-21T14:00:00Z"
+            endDate: "2020-09-21T22:00:00Z"
+
+  BasePeriod:
+    type: "object"
+    properties:
+      startDate:
+        description: "Start date of the period in timestamp"
+        type: "string"
+        format: "date-time"
+        example: "2020-09-21T08:00:00Z"
+      endDate:
+        description: "End date of the period in timestamp"
+        type: "string"
+        format: "date-time"
+        example: "2020-09-21T18:00:00Z"
+
+  InvalidOrMissingArgument:
+    type: "object"
+    properties:
+      details:
+        type: object
+        properties:
+          radius:
+            type: "string"
+            example: "type should be number and is string"
+          latitude:
+            type: "string"
+            example: "missing"
+      message:
+        type: "string"
+        example: "Request had invalid or missing arguments."
+      status:
+        type: "string"
+        example: "INVALID_ARGUMENT"
+
+  ErrorsPeriodItem:
+    type: object
+    properties:
+      startDate:
+        description: "Start date of the period in timestamp"
+        type: "string"
+        format: "date-time"
+        example: "2020-09-21T08:00:00Z"
+      endDate:
+        description: "End date of the period in timestamp"
+        type: "string"
+        format: "date-time"
+        example: "2020-09-21T18:00:00Z"
+      reason:
+        type: string
+        example: "Planning not free"
+
+
+  ErrorsPeriodArray:
+    type: array
+    items:
+      $ref: "#/definitions/ErrorsPeriodItem"
+
+
+# Added by API Auto Mocking Plugin
+host: virtserver.swaggerhub.com
+basePath: /personnal1/calendar/1.0.0
+schemes:
+  - https
